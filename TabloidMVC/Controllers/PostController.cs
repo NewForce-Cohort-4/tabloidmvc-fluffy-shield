@@ -13,18 +13,41 @@ namespace TabloidMVC.Controllers
     {
         private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
+								private readonly IUserProfileRepository _userRepository;
 
-        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository)
+        public PostController(
+												IPostRepository postRepository, 
+												ICategoryRepository categoryRepository, 
+												IUserProfileRepository userProfileRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
+												_userRepository = userProfileRepository;
+
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int UserId)
         {
-            var posts = _postRepository.GetAllPublishedPosts();
-            return View(posts);
+												int activeUser = GetCurrentUserProfileId();
+												if (activeUser == UserId)
+												{
+																var posts = _postRepository.GetPublishedByUser(activeUser);
+																return View(posts);
+												}
+												else
+												{
+																var posts = _postRepository.GetAllPublishedPosts();
+																return View(posts);
+												}
         }
+
+								public IActionResult Myposts(int UserId)
+								{
+												int activeUser = GetCurrentUserProfileId();
+												var posts = _postRepository.GetPublishedByUser(activeUser);
+												return View(posts);
+
+								}
 
         public IActionResult Details(int id)
         {
