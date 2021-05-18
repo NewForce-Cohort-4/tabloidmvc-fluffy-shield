@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using TabloidMVC.Models;
 
@@ -30,7 +31,7 @@ namespace TabloidMVC.Repositories
 
                     reader.Close();
 
-                    return categories;
+                    return categories.OrderBy(c => c.Name).ToList();
                 }
             }
         }
