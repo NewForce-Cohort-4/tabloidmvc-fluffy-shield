@@ -39,6 +39,7 @@ namespace TabloidMVC.Controllers
         // GET: CategoryController/Create
         public ActionResult Create()
         {
+            //new instance of a category to be created
             var cm = new Category();
             return View(cm);
         }
@@ -50,6 +51,7 @@ namespace TabloidMVC.Controllers
         {
             try
             {
+                //adding a category to the database and redirecting the user back to the index page of category
                 _categoryRepositroy.Add(cm);
                 return RedirectToAction(nameof(Index));
             }
