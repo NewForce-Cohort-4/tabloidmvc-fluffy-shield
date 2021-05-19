@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TabloidMVC.Models;
 using TabloidMVC.Repositories;
 
 namespace TabloidMVC.Controllers
@@ -38,21 +39,23 @@ namespace TabloidMVC.Controllers
         // GET: CategoryController/Create
         public ActionResult Create()
         {
-            return View();
+            var cm = new Category();
+            return View(cm);
         }
 
         // POST: CategoryController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Category cm)
         {
             try
             {
+                _categoryRepositroy.Add(cm);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View(cm);
             }
         }
 
