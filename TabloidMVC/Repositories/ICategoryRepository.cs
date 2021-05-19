@@ -9,5 +9,9 @@ namespace TabloidMVC.Repositories
         List<Category> GetAll();
         // interface to add a category
         void Add(Category category);
+
+        //interfact to delete a category from the categories ID
+        void Delete(int categoryId);
+        Category GetCategoryById(int id);
     }
 }

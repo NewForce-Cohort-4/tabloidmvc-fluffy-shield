@@ -65,9 +65,9 @@ namespace TabloidMVC.Repositories
                     cmd.CommandText = @"
                             DELETE FROM Category
                             WHERE Id = @id
-                        ";
+                           ";
 
-                    cmd.Parameters.AddWithValue("@id",                      categoryId);
+                    cmd.Parameters.AddWithValue("@id", categoryId);
 
                     cmd.ExecuteNonQuery();
                 }
