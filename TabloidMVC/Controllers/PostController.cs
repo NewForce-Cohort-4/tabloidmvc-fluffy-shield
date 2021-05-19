@@ -86,7 +86,7 @@ namespace TabloidMVC.Controllers
         {
             try
             {
-                // update the dogs OwnerId to the current user's Id 
+                // update to the current user's Id 
                 post.UserProfileId = GetCurrentUserProfileId();
 
                 _postRepository.Delete(id);
@@ -121,7 +121,7 @@ namespace TabloidMVC.Controllers
             {
                 _postRepository.Update(post);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { id = post.Id});
             }
             catch (Exception ex)
             {

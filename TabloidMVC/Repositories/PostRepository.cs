@@ -229,24 +229,29 @@ namespace TabloidMVC.Repositories
                     cmd.CommandText = @"
                             UPDATE Post
                             SET 
-                                Title = @title, 
+                                [Title] = @title, 
                                 Content = @content,
-                                ImageLocation = @imagelocation
-                                CreateDateTime = @createdatetime
-                                PublishDateTime = @publishdatetime
-                                IsApproved = @isapproved
+                                ImageLocation = @imagelocation,
+                              
+                                PublishDateTime = @publishdatetime,
+                                IsApproved = @isapproved,
                                 CategoryId = @categoryId
-                                UserProfileId = @userprofileId
                             WHERE Id = @id";
 
                     cmd.Parameters.AddWithValue("@title", post.Title);
                     cmd.Parameters.AddWithValue("@content", post.Content);
-                    cmd.Parameters.AddWithValue("@imagelocation", post.ImageLocation);
-                    cmd.Parameters.AddWithValue("@createdatetime", post.CreateDateTime);
+                    if (post.ImageLocation == null)
+                    {
+                        cmd.Parameters.AddWithValue("@imagelocation", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@imagelocation", post.ImageLocation);
+                    }
+                   // cmd.Parameters.AddWithValue("@createdatetime", post.CreateDateTime);
                     cmd.Parameters.AddWithValue("@publishdatetime", post.PublishDateTime);
                     cmd.Parameters.AddWithValue("@isapproved", post.IsApproved);
                     cmd.Parameters.AddWithValue("@categoryId", post.CategoryId);
-                    cmd.Parameters.AddWithValue("@UserProfileId", post.UserProfileId);
                     cmd.Parameters.AddWithValue("@id", post.Id);
 
                     cmd.ExecuteNonQuery();
