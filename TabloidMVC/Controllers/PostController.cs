@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
@@ -69,6 +70,13 @@ namespace TabloidMVC.Controllers
             }
             return View(vm);
         }
+
+								public IActionResult TagDetails(int id)
+								{
+												Tag Tag = new Tag();
+												Tag.tags = _tagRepository.GetAllTags();
+												return View(Tag.tags);
+								}
 
         public IActionResult Create()
         {

@@ -1,30 +1,30 @@
 ﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel
 
 @{
-    ViewData["Title"] = $"Post - {Model.Post.Title}";
+				ViewData["Title"] = $"Post - {Model.Post.Title}";
 }
 
 <div class="container pt-5">
-    <div class="post">
-        <section class="px-3">
-            <div class="row justify-content-between">
-                <h1 class="text-secondary">@Model.Post.Title</h1>
-                <h1 class="text-black-50">@Model.Post.Category.Name</h1>
-            </div>
-            <div class="row justify-content-between">
-                <p class="text-secondary">Written by @Model.Post.UserProfile.DisplayName</p>
-                <p class="text-black-50">Published on @Html.DisplayFor(model => Model.Post.PublishDateTime)</p>
-            </div>
-            <div class="row">
-                <a asp-action="Edit" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                </a>
-                <a asp-action="Delete" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Delete">
-                    <i class="fas fa-trash"></i>
-                </a>
-            </div>
-        </section>
-        <hr />
+				<div class="post">
+								<section class="px-3">
+												<div class="row justify-content-between">
+																<h1 class="text-secondary">@Model.Post.Title</h1>
+																<h1 class="text-black-50">@Model.Post.Category.Name</h1>
+												</div>
+												<div class="row justify-content-between">
+																<p class="text-secondary">Written by @Model.Post.UserProfile.DisplayName</p>
+																<p class="text-black-50">Published on @Html.DisplayFor(model => Model.Post.PublishDateTime)</p>
+												</div>
+												<div class="row">
+																<a asp-action="Edit" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Edit">
+																				<i class="fas fa-pencil-alt"></i>
+																</a>
+																<a asp-action="Delete" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Delete">
+																				<i class="fas fa-trash"></i>
+																</a>
+												</div>
+								</section>
+								<hr />
 								<div class="Container">
 												<div class="row">
 																<div class="col-sm-9">
@@ -54,7 +54,7 @@
 																								</section>
 																								<section class="row justify-content-center mt-5">
 																												<h5 class="text-black-20 text-center">Post Options</h5>
-																												<a asp-action="Edit" asp-route-id="@Model.Post.Id" class="btn btn-secondary" title="Tag Management">
+																												<a asp-action="TagDetails" asp-route-id="@Model.Post.Id" class="btn btn-secondary" title="Tag Management">
 																																Tag Management
 																												</a>
 																												@*<button class="btn btn-secondary">Tag Management</button>*@
