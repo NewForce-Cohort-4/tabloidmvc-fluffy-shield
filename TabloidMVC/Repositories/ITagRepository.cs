@@ -6,7 +6,7 @@ using TabloidMVC.Models;
 
 namespace TabloidMVC.Repositories
 {
-				interface ITagRepository
+				public interface ITagRepository
 				{
 								public List<Tag> GetAllTags();
 				}

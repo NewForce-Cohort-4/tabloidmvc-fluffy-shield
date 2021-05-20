@@ -13,19 +13,21 @@ namespace TabloidMVC.Controllers
     [Authorize]
     public class PostController : Controller
     {
-        private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IPostRepository _postRepository;
 								private readonly IUserProfileRepository _userRepository;
+								private readonly ITagRepository _tagRepository;
 
-        public PostController(
-												IPostRepository postRepository, 
+								public PostController(
 												ICategoryRepository categoryRepository, 
-												IUserProfileRepository userProfileRepository)
-        {
+												IPostRepository postRepository, 
+												IUserProfileRepository userProfileRepository,
+												ITagRepository tagRepository)
+								{
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
 												_userRepository = userProfileRepository;
-
+												_tagRepository = tagRepository;
         }
 
         public IActionResult Index(int UserId)
@@ -53,17 +55,19 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Details(int id)
         {
-            var post = _postRepository.GetPublishedPostById(id);
-            if (post == null)
+												var vm = new PostDetailViewModel();
+            vm.Post = _postRepository.GetPublishedPostById(id);
+												vm.AllTags = _tagRepository.GetAllTags();
+            if (vm.Post == null)
             {
                 int userId = GetCurrentUserProfileId();
-                post = _postRepository.GetUserPostById(id, userId);
-                if (post == null)
+                vm.Post = _postRepository.GetUserPostById(id, userId);
+                if (vm.Post == null)
                 {
                     return NotFound();
                 }
             }
-            return View(post);
+            return View(vm);
         }
 
         public IActionResult Create()
