@@ -1,1 +1,2 @@
-﻿Select * from post;
+﻿
+   Select * from post;
