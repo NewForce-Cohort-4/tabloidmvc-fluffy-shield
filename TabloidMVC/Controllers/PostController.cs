@@ -58,7 +58,7 @@ namespace TabloidMVC.Controllers
         {
 												var vm = new PostDetailViewModel();
             vm.Post = _postRepository.GetPublishedPostById(id);
-												vm.AllTags = _tagRepository.GetAllTags();
+												vm.AllTags = _tagRepository.GetTagByPostId(id);
             if (vm.Post == null)
             {
                 int userId = GetCurrentUserProfileId();
@@ -71,11 +71,52 @@ namespace TabloidMVC.Controllers
             return View(vm);
         }
 
+								/// <summary>
+								///					Ticket # 17 - Add a Tag to a Post
+								/// </summary>
+
+								// TagDetails route creates a GET view to display all tags
+								// The TagRoute view receives a list of Tags and related Post.Id
 								public IActionResult TagDetails(int id)
 								{
-												Tag Tag = new Tag();
-												Tag.tags = _tagRepository.GetAllTags();
-												return View(Tag.tags);
+												PostDetailViewModel vm = new PostDetailViewModel();
+												vm.TagsByPost = _tagRepository.GetAllTags();
+												vm.Post = new Post();
+												vm.Post.Id = id;
+												return View(vm);
+								}
+
+								/// <summary>
+								///					Ticket # 17 - Add a Tag to a Post
+								/// </summary>
+
+								// TagDetails post route receives all tags from Form POST
+								// SelectedTags is called from the view model to store all tags from DB
+								// POST method receives tag.Name [String] and Tag.Selected [Boolean],
+								// Find method is envoked on SelectedTags to match Tag Name and 
+								// pass the new object to tagRepository, which contains Tag.Id
+
+								[HttpPost]
+								public IActionResult TagDetails(PostDetailViewModel vm, int id)
+								{
+												vm.SelectedTags = _tagRepository.GetAllTags();
+												try
+												{
+																foreach (Tag tag in vm.TagsByPost)
+																{
+																				if (tag.Selected)
+																				{
+																								Tag fTag = vm.SelectedTags.Find(t => t.Name == tag.Name);
+																								_postRepository.PostAddTag(fTag, id);
+																				}
+																}
+																return RedirectToAction("Details", new { id = id });
+												}
+												catch (Exception ex)
+												{
+																return View();
+												}
+
 								}
 
         public IActionResult Create()

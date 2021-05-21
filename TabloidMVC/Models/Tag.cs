@@ -9,6 +9,7 @@ namespace TabloidMVC.Models
 				{
 								public int Id { get; set; }
 								public string Name { get; set; }
+								public bool Selected { get; set; }
 								public List<Tag> tags = new List<Tag>();
 				}
 }
