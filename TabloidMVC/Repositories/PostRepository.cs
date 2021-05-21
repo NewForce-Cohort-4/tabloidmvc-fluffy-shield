@@ -49,15 +49,15 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
-        public List<Post> GetPublishedByUser(int userId)
-        {
-            using (var conn = Connection)
-            {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-																								SELECT p.Id, p.Title, p.Content, 
+		public List<Post> GetPublishedByUser(int userId)
+		{
+		    using (var conn = Connection)
+			{
+				conn.Open();
+				using (var cmd = conn.CreateCommand())
+				{
+						cmd.CommandText = @"
+							SELECT p.Id, p.Title, p.Content, 
                               p.ImageLocation AS HeaderImage,
                               p.CreateDateTime, p.PublishDateTime, p.IsApproved,
                               p.CategoryId, p.UserProfileId,
@@ -73,17 +73,23 @@ namespace TabloidMVC.Repositories
                         WHERE IsApproved = 1 AND PublishDateTime < SYSDATETIME() AND p.UserProfileId = @Id;
 																				";
 
-                    cmd.Parameters.AddWithValue("@Id", userId);
+						cmd.Parameters.AddWithValue("@Id", userId);
 
-                    List<Post> userPosts = new List<Post>();
+					    List<Post> userPosts = new List<Post>();
 
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    { userPosts.Add(NewPostFromReader(reader)); }; reader.Close();
-                    return userPosts;
-                }
-            }
-        }
+						SqlDataReader reader = cmd.ExecuteReader();
+						while (reader.Read())
+						{
+							userPosts.Add(NewPostFromReader(reader));
+						};
+
+						reader.Close();
+
+					    return userPosts;
+
+				}
+			}
+		}
 
         public Post GetPublishedPostById(int id)
         {
@@ -247,6 +253,55 @@ namespace TabloidMVC.Repositories
                         ";
 
                     cmd.Parameters.AddWithValue("@id", postId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void Update(Post post)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            UPDATE Post
+                            SET 
+                                [Title] = @title, 
+                                Content = @content,
+                                ImageLocation = @imagelocation,
+                              
+                                PublishDateTime = @publishdatetime,
+                                IsApproved = @isapproved,
+                                CategoryId = @categoryId
+                            WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@title", post.Title);
+                    cmd.Parameters.AddWithValue("@content", post.Content);
+                    if (post.ImageLocation == null)
+                    {
+                        cmd.Parameters.AddWithValue("@imagelocation", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@imagelocation", post.ImageLocation);
+                    }
+                   // cmd.Parameters.AddWithValue("@createdatetime", post.CreateDateTime);
+                   if(post.PublishDateTime == null)
+                    {
+                        cmd.Parameters.AddWithValue("@publishdatetime", DBNull.Value);
+                    }
+                   else
+                    {
+                        cmd.Parameters.AddWithValue("@publishdatetime", post.PublishDateTime);
+                    }
+                    //cmd.Parameters.AddWithValue("@publishdatetime", post.PublishDateTime);
+                    cmd.Parameters.AddWithValue("@isapproved", post.IsApproved);
+                    cmd.Parameters.AddWithValue("@categoryId", post.CategoryId);
+                    cmd.Parameters.AddWithValue("@id", post.Id);
 
                     cmd.ExecuteNonQuery();
                 }

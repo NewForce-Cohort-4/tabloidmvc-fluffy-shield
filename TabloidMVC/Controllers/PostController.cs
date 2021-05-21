@@ -15,41 +15,42 @@ namespace TabloidMVC.Controllers
     {
         private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
-								private readonly IUserProfileRepository _userRepository;
+		private readonly IUserProfileRepository _userRepository;
 
         public PostController(
-												IPostRepository postRepository, 
-												ICategoryRepository categoryRepository, 
-												IUserProfileRepository userProfileRepository)
+			IPostRepository postRepository, 
+			ICategoryRepository categoryRepository, 
+			IUserProfileRepository userProfileRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
-												_userRepository = userProfileRepository;
+			_userRepository = userProfileRepository;
 
         }
 
         public IActionResult Index(int UserId)
         {
-												int activeUser = GetCurrentUserProfileId();
-												if (activeUser == UserId)
-												{
-																var posts = _postRepository.GetPublishedByUser(activeUser);
-																return View(posts);
-												}
-												else
-												{
-																var posts = _postRepository.GetAllPublishedPosts();
-																return View(posts);
-												}
+            UserViewModel vm = new UserViewModel();
+            vm.activeUser = GetCurrentUserProfileId();
+			    if (vm.activeUser == UserId)
+				{
+					vm.Posts = _postRepository.GetPublishedByUser(vm.activeUser);
+					return View(vm);
+				}
+			    else
+				{
+					vm.Posts = _postRepository.GetAllPublishedPosts();
+				    return View(vm);
+				}
         }
 
-								public IActionResult Myposts(int UserId)
-								{
-												int activeUser = GetCurrentUserProfileId();
-												var posts = _postRepository.GetPublishedByUser(activeUser);
-												return View(posts);
+		public IActionResult Myposts(int UserId)
+		{
+			int activeUser = GetCurrentUserProfileId();
+			var posts = _postRepository.GetPublishedByUser(activeUser);
+		    return View(posts);
 
-								}
+		}
 
         public IActionResult Details(int id)
         {
@@ -109,7 +110,7 @@ namespace TabloidMVC.Controllers
         {
             try
             {
-                // update the dogs OwnerId to the current user's Id 
+                // update to the current user's Id 
                 post.UserProfileId = GetCurrentUserProfileId();
 
                 _postRepository.Delete(id);
@@ -122,6 +123,48 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        // GET: Post/Edit
+        public IActionResult Edit(int id)
+        {
+            var vm = new PostEditViewModel();
+            vm.CategoryOptions = _categoryRepository.GetAll();
+            vm.Post = _postRepository.GetPublishedPostById(id);
+            
+            
+            int activeUser = GetCurrentUserProfileId();
+            if (vm.Post == null)
+            {
+                return NotFound();
+            }
+            else if (activeUser == vm.Post.UserProfileId)
+            {
+                return View(vm);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        // POST: Owners/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, Post post)
+        {
+            var vm = new PostEditViewModel();
+            try
+            {
+                post.IsApproved = true;
+                _postRepository.Update(post);
+
+                    return RedirectToAction("Details", new { id = id });
+
+            }
+            catch (Exception ex)
+            {
+                return View(vm);
+            }
+        }
 
         private int GetCurrentUserProfileId()
         {
