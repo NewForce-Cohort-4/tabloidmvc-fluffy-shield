@@ -30,16 +30,17 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Index(int UserId)
         {
-			int activeUser = GetCurrentUserProfileId();
-			    if (activeUser == UserId)
+            UserViewModel vm = new UserViewModel();
+            vm.activeUser = GetCurrentUserProfileId();
+			    if (vm.activeUser == UserId)
 				{
-					var posts = _postRepository.GetPublishedByUser(activeUser);
-					return View(posts);
+					vm.Posts = _postRepository.GetPublishedByUser(vm.activeUser);
+					return View(vm);
 				}
 			    else
 				{
-					var posts = _postRepository.GetAllPublishedPosts();
-				    return View(posts);
+					vm.Posts = _postRepository.GetAllPublishedPosts();
+				    return View(vm);
 				}
         }
 
@@ -125,16 +126,19 @@ namespace TabloidMVC.Controllers
         // GET: Post/Edit
         public IActionResult Edit(int id)
         {
-            Post post = _postRepository.GetPublishedPostById(id);
-            post.CategoryOptions = _categoryRepository.GetAll();
+            var vm = new PostEditViewModel();
+            vm.CategoryOptions = _categoryRepository.GetAll();
+            vm.Post = _postRepository.GetPublishedPostById(id);
+            
+            
             int activeUser = GetCurrentUserProfileId();
-            if (post == null)
+            if (vm.Post == null)
             {
                 return NotFound();
             }
-            else if (activeUser == post.UserProfileId)
+            else if (activeUser == vm.Post.UserProfileId)
             {
-                return View(post);
+                return View(vm);
             }
             else
             {
@@ -147,23 +151,18 @@ namespace TabloidMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Post post)
         {
+            var vm = new PostEditViewModel();
             try
             {
                 post.IsApproved = true;
                 _postRepository.Update(post);
-                int activeUser = GetCurrentUserProfileId();
-                if (activeUser == post.UserProfileId) {
-                    return RedirectToAction("Details", new { id = post.Id });
-                } else
-                {
-                    return NotFound(); 
-                }
 
-                
+                    return RedirectToAction("Details", new { id = id });
+
             }
             catch (Exception ex)
             {
-                return View(post);
+                return View(vm);
             }
         }
 
