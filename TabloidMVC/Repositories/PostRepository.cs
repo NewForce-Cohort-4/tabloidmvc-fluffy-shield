@@ -73,23 +73,17 @@ namespace TabloidMVC.Repositories
 																								WHERE IsApproved = 1 AND PublishDateTime < SYSDATETIME() AND p.UserProfileId = @Id;
 																				";
 
-																				cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.Parameters.AddWithValue("@Id", userId);
 
-																				List<Post> userPosts = new List<Post>();
+                    List<Post> userPosts = new List<Post>();
 
-																				SqlDataReader reader = cmd.ExecuteReader();
-																				while (reader.Read())
-																				{
-																								userPosts.Add(NewPostFromReader(reader));
-																				};
-
-																				reader.Close();
-
-																				return userPosts;
-
-																}
-												}
-								}
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    { userPosts.Add(NewPostFromReader(reader)); }; reader.Close();
+                    return userPosts;
+                }
+            }
+        }
 
 								public Post GetPublishedPostById(int id)
 								{
