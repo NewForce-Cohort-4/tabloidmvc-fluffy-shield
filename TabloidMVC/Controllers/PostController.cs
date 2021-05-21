@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
@@ -13,58 +14,111 @@ namespace TabloidMVC.Controllers
     [Authorize]
     public class PostController : Controller
     {
-        private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IUserProfileRepository _userRepository;
+        private readonly IPostRepository _postRepository;
+								private readonly IUserProfileRepository _userRepository;
+								private readonly ITagRepository _tagRepository;
 
-        public PostController(
-                                                IPostRepository postRepository,
-                                                ICategoryRepository categoryRepository,
-                                                IUserProfileRepository userProfileRepository)
-        {
+								public PostController(
+												ICategoryRepository categoryRepository, 
+												IPostRepository postRepository, 
+												IUserProfileRepository userProfileRepository,
+												ITagRepository tagRepository)
+								{
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
-            _userRepository = userProfileRepository;
-
+												_userRepository = userProfileRepository;
+												_tagRepository = tagRepository;
         }
 
         public IActionResult Index(int UserId)
         {
-            int activeUser = GetCurrentUserProfileId();
-            if (activeUser == UserId)
-            {
-                var posts = _postRepository.GetPublishedByUser(activeUser);
-                return View(posts);
-            }
-            else
-            {
-                var posts = _postRepository.GetAllPublishedPosts();
-                return View(posts);
-            }
+            UserViewModel vm = new UserViewModel();
+            vm.activeUser = GetCurrentUserProfileId();
+			    if (vm.activeUser == UserId)
+				{
+					vm.Posts = _postRepository.GetPublishedByUser(vm.activeUser);
+					return View(vm);
+				}
+			    else
+				{
+					vm.Posts = _postRepository.GetAllPublishedPosts();
+				    return View(vm);
+				}
         }
 
-        public IActionResult Myposts(int UserId)
-        {
-            int activeUser = GetCurrentUserProfileId();
-            var posts = _postRepository.GetPublishedByUser(activeUser);
-            return View(posts);
+		public IActionResult Myposts(int UserId)
+		{
+			int activeUser = GetCurrentUserProfileId();
+			var posts = _postRepository.GetPublishedByUser(activeUser);
+		    return View(posts);
 
-        }
+		}
 
         public IActionResult Details(int id)
         {
-            var post = _postRepository.GetPublishedPostById(id);
-            if (post == null)
+												var vm = new PostDetailViewModel();
+            vm.Post = _postRepository.GetPublishedPostById(id);
+												vm.AllTags = _tagRepository.GetTagByPostId(id);
+            if (vm.Post == null)
             {
                 int userId = GetCurrentUserProfileId();
-                post = _postRepository.GetUserPostById(id, userId);
-                if (post == null)
+                vm.Post = _postRepository.GetUserPostById(id, userId);
+                if (vm.Post == null)
                 {
                     return NotFound();
                 }
             }
-            return View(post);
+            return View(vm);
         }
+
+								/// <summary>
+								///					Ticket # 17 - Add a Tag to a Post
+								/// </summary>
+
+								// TagDetails route creates a GET view to display all tags
+								// The TagRoute view receives a list of Tags and related Post.Id
+								public IActionResult TagDetails(int id)
+								{
+												PostDetailViewModel vm = new PostDetailViewModel();
+												vm.TagsByPost = _tagRepository.GetAllTags();
+												vm.Post = new Post();
+												vm.Post.Id = id;
+												return View(vm);
+								}
+
+								/// <summary>
+								///					Ticket # 17 - Add a Tag to a Post
+								/// </summary>
+
+								// TagDetails post route receives all tags from Form POST
+								// SelectedTags is called from the view model to store all tags from DB
+								// POST method receives tag.Name [String] and Tag.Selected [Boolean],
+								// Find method is envoked on SelectedTags to match Tag Name and 
+								// pass the new object to tagRepository, which contains Tag.Id
+
+								[HttpPost]
+								public IActionResult TagDetails(PostDetailViewModel vm, int id)
+								{
+												vm.SelectedTags = _tagRepository.GetAllTags();
+												try
+												{
+																foreach (Tag tag in vm.TagsByPost)
+																{
+																				if (tag.Selected)
+																				{
+																								Tag fTag = vm.SelectedTags.Find(t => t.Name == tag.Name);
+																								_postRepository.PostAddTag(fTag, id);
+																				}
+																}
+																return RedirectToAction("Details", new { id = id });
+												}
+												catch (Exception ex)
+												{
+																return View();
+												}
+
+								}
 
         public IActionResult Create()
         {
@@ -109,7 +163,7 @@ namespace TabloidMVC.Controllers
         {
             try
             {
-                // update the dogs OwnerId to the current user's Id 
+                // update to the current user's Id 
                 post.UserProfileId = GetCurrentUserProfileId();
 
                 _postRepository.Delete(id);
@@ -122,6 +176,48 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        // GET: Post/Edit
+        public IActionResult Edit(int id)
+        {
+            var vm = new PostEditViewModel();
+            vm.CategoryOptions = _categoryRepository.GetAll();
+            vm.Post = _postRepository.GetPublishedPostById(id);
+            
+            
+            int activeUser = GetCurrentUserProfileId();
+            if (vm.Post == null)
+            {
+                return NotFound();
+            }
+            else if (activeUser == vm.Post.UserProfileId)
+            {
+                return View(vm);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        // POST: Owners/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, Post post)
+        {
+            var vm = new PostEditViewModel();
+            try
+            {
+                post.IsApproved = true;
+                _postRepository.Update(post);
+
+                    return RedirectToAction("Details", new { id = id });
+
+            }
+            catch (Exception ex)
+            {
+                return View(vm);
+            }
+        }
 
         private int GetCurrentUserProfileId()
         {
