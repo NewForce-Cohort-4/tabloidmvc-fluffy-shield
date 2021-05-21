@@ -13,5 +13,6 @@ namespace TabloidMVC.Repositories
         //interface to delete a category from the categories ID
         void Delete(int categoryId);
         Category GetCategoryById(int id);
+        void UpdateCategory(Category category);
     }
 }
