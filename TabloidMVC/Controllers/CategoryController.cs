@@ -64,6 +64,7 @@ namespace TabloidMVC.Controllers
         // GET: CategoryController/Edit/5
         public ActionResult Edit(int id)
         {
+            //grabs the category clicked with by it's id that is stored in the database
             Category category = _categoryRepositroy.GetCategoryById(id);
             if (category == null)
             {
@@ -79,12 +80,15 @@ namespace TabloidMVC.Controllers
         {
             try
             {
+                // runs the method UpdateCategory saving the changes made within the edit functionality in the browser 
                 _categoryRepositroy.UpdateCategory(category);
 
+                // return will take you back to the index view listing all of the categories with any edits made
                 return RedirectToAction("Index");
             }
             catch
             {
+                //this will keep you in the same view of editing a category and keep you there signaling there is most likely an issue with the SQL Query
                 return View(category);
             }
         }
