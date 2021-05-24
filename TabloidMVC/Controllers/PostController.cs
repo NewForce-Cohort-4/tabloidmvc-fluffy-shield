@@ -81,9 +81,17 @@ namespace TabloidMVC.Controllers
 								public IActionResult TagDetails(int id)
 								{
 												PostDetailViewModel vm = new PostDetailViewModel();
+												vm.AllTags = _tagRepository.GetTagByPostId(id);
 												vm.TagsByPost = _tagRepository.GetAllTags();
-												vm.Post = new Post();
-												vm.Post.Id = id;
+												foreach (Tag tag in vm.TagsByPost)
+												{
+																if(vm.AllTags.Exists(t => t.Name == tag.Name))
+																{
+																				tag.Selected = true;
+																}
+												}
+												vm.Post = new Post() { 
+												Id = id};
 												return View(vm);
 								}
 

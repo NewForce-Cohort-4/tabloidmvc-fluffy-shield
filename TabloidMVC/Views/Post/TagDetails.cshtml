@@ -17,16 +17,16 @@
 								<div class="col-md-4">
 												<form asp-action="TagDetails">
 																<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-																<div class="btn-group-toggle d-flex flex-column align-content-center" data-toggle="buttons">
-																				@foreach (Tag tag in Model.TagsByPost)
-																				{
-																								<label class="btn btn-info p-1 my-2">
+																				<div class="btn-group-toggle d-flex flex-column align-content-center" data-toggle="buttons">
+																								@foreach (Tag tag in Model.TagsByPost)
+																								{
+																								<label class="btn btn-info p-1 my-2  @(tag.Selected ? "active" : "")">
 																												<input type="hidden" name="TagsByPost.Index" value="@tag.Name" />
 																												<input type="hidden" name="TagsByPost[@tag.Name].Name" value="@tag.Name" />
-																												<input asp-for="@tag.Selected" name="TagsByPost[@tag.Name].Selected" autocomplete="off" />@tag.Name
+																												<input asp-for="@tag.Selected" name="TagsByPost[@tag.Name].Selected" value="@tag.Selected" autocomplete="off" />@tag.Name
 																								</label>
-																				}
-																</div>
+																								}
+																				</div>
 																<div class="form-group mt-2">
 																				<input type="submit" asp-route-id="@Model.Post.Id" value="Save" class="btn btn-primary" />
 																</div>
