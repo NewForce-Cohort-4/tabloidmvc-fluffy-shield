@@ -16,19 +16,19 @@ namespace TabloidMVC.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IPostRepository _postRepository;
-								private readonly IUserProfileRepository _userRepository;
-								private readonly ITagRepository _tagRepository;
+		private readonly IUserProfileRepository _userRepository;
+		private readonly ITagRepository _tagRepository;
 
-								public PostController(
-												ICategoryRepository categoryRepository, 
-												IPostRepository postRepository, 
-												IUserProfileRepository userProfileRepository,
-												ITagRepository tagRepository)
-								{
-            _postRepository = postRepository;
-            _categoryRepository = categoryRepository;
-												_userRepository = userProfileRepository;
-												_tagRepository = tagRepository;
+		public PostController(
+		ICategoryRepository categoryRepository, 
+	    IPostRepository postRepository, 
+		IUserProfileRepository userProfileRepository,
+		ITagRepository tagRepository)
+		{
+        _postRepository = postRepository;
+        _categoryRepository = categoryRepository;
+		_userRepository = userProfileRepository;
+	    _tagRepository = tagRepository;
         }
 
         public IActionResult Index(int UserId)
