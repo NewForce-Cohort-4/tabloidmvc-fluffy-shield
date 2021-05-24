@@ -224,6 +224,33 @@ namespace TabloidMVC.Repositories
 												}
 								}
 
+								/// <summary>
+								///					Ticket # 18 - Add a Tag to a Post
+								///					
+								///					Added PostDeleteTag to remove tags from join table,
+								///					where both the selected TagId & Post Id match.
+								/// </summary>
+
+								public void PostDeleteTag(Tag tag, int postId)
+								{
+												using (SqlConnection conn = Connection)
+												{
+																conn.Open();
+																using (SqlCommand cmd = conn.CreateCommand())
+																{
+																				cmd.CommandText = @"																							
+																								DELETE FROM PostTag
+																								WHERE PostId = @PostId AND TagId = @TagId																						
+																				";
+																				cmd.Parameters.AddWithValue("@TagId", tag.Id);
+																				cmd.Parameters.AddWithValue("@PostId", postId);
+
+																				cmd.ExecuteNonQuery();
+																}
+
+												}
+								}
+
 								private Post NewPostFromReader(SqlDataReader reader)
 								{
 												return new Post()
