@@ -109,14 +109,35 @@ namespace TabloidMVC.Controllers
 								public IActionResult TagDetails(PostDetailViewModel vm, int id)
 								{
 												vm.SelectedTags = _tagRepository.GetAllTags();
+												vm.AllTags = _tagRepository.GetTagByPostId(id);
 												try
 												{
 																foreach (Tag tag in vm.TagsByPost)
 																{
+																				bool oldTag = vm.AllTags.Exists(t => t.Name == tag.Name);
 																				if (tag.Selected)
 																				{
-																								Tag fTag = vm.SelectedTags.Find(t => t.Name == tag.Name);
-																								_postRepository.PostAddTag(fTag, id);
+																								if (!oldTag)
+																								{
+																												Tag fTag = vm.SelectedTags.Find(t => t.Name == tag.Name);
+																												_postRepository.PostAddTag(fTag, id);
+																								}
+																								else
+																								{
+																												continue;
+																								}
+																				}
+																				else
+																				{
+																								try
+																								{
+																												Tag fTag = vm.SelectedTags.Find(t => t.Name == tag.Name);
+																												_postRepository.PostDeleteTag(fTag, id);
+																								}
+																								catch (Exception)
+																								{
+																												continue;
+																								}
 																				}
 																}
 																return RedirectToAction("Details", new { id = id });
